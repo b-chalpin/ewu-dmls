@@ -16,7 +16,7 @@ def main() -> None:
     new_model_dir = f"../models/{new_model_name}"
 
     os.mkdir(new_model_dir)
-    shutil.copytree(src="../common/template", dst=new_model_dir, dirs_exist_ok=True)
+    shutil.copytree(src="../common/model-template", dst=new_model_dir, dirs_exist_ok=True)
 
     print(f"New model template created at {os.path.abspath(new_model_dir)}")
 
