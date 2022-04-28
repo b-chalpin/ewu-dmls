@@ -1,6 +1,10 @@
+import sys
+sys.path.append("../..")
+
 import cherrypy
 from train_queue_service import TrainQueueService
-from interface.train_queue_message import TrainQueueMessage
+from common.interface.train_queue_message import TrainQueueMessage
+from common.utils.evironment_utils import load_env
 
 @cherrypy.expose
 class TrainQueueApi(object):
@@ -28,15 +32,16 @@ class TrainQueueApi(object):
             raise cherrypy.HTTPError(400, 'Body must not be empty.')
 
         if not TrainQueueMessage.validate(body):
-            raise cherrypy.HTTPError(400, f'Invalid payload. Body must have structure {TrainQueueMessage.get_structure()}')
+            raise cherrypy.HTTPError(400, f'Invalid payload. Body must have structure {TrainQueueMessage.get_json_structure()}')
 
         train_message = TrainQueueMessage(body)
         
-        cherrypy.log(train_message.to_json())
+        cherrypy.log(f"Payload received from user: {train_message.to_json()}")
 
         self.service.process_train_queue_request(train_message)
 
         return { "success": True }
 
 if __name__ == "__main__": 
-    cherrypy.quickstart(TrainQueueApi(), '/api/queue', 'C:/git/school/ewu-dmls/src/modules/train-queue/train_queue_app.conf')
+    load_env("../.env") # load our environment vars
+    cherrypy.quickstart(TrainQueueApi(), '/api/queue', './train_queue_api.conf')
